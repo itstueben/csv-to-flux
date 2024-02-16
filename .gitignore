@@ -1,0 +1,5 @@
+.idea
+.cert/
+.DS_Store
+node_modules
+files/*
