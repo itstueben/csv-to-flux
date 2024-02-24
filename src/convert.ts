@@ -4,7 +4,6 @@ import { hideBin } from "yargs/helpers";
 import { parse, stringify, transform } from "csv";
 import * as fs from "fs";
 import { convertGermanNumberToNumber, convertHyphenToNull } from "./helpers";
-import { write } from "fs";
 
 void yargs(hideBin(process.argv))
   .command(
@@ -13,11 +12,11 @@ void yargs(hideBin(process.argv))
     (yargs) => {
       return yargs
         .option("input", {
-          alias: "if",
+          alias: "i",
           default: "files/data.csv",
         })
         .option("output", {
-          alias: "of",
+          alias: "o",
           default: "output.csv",
         });
     },
@@ -46,6 +45,10 @@ void yargs(hideBin(process.argv))
               if (keys[i] === "category") {
                 // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
                 delete record[keys[i]];
+              } else if (keys[i] === "timestamp") {
+                // Convert time String to
+                // @ts-ignore
+                record[keys[i]] = new Date(cell).toISOString();
               } else {
                 const cellHyphen = convertHyphenToNull(cell);
                 const cellPoint = convertGermanNumberToNumber(cellHyphen);
