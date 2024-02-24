@@ -4,6 +4,9 @@
   "description": "",
   "author": "Marcus Stüben<marcus@it-stueben.de>",
   "license": "ISC",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "scripts": {
     "lint": "eslint . --config .eslintrc.js",
     "lint:fix": "eslint . --fix --config .eslintrc.js"

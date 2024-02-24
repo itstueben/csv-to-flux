@@ -1,5 +1,6 @@
 # Sample to generate csv file with csv
 
 ## How to run
+- `nvm use`
 - `npm install`
-- `node generateTest.js full -c 1`
+- `ts-node src/convert.ts buderus`
