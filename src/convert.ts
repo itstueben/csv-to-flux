@@ -48,7 +48,7 @@ void yargs(hideBin(process.argv))
               } else if (keys[i] === "timestamp") {
                 // Convert time String to
                 // @ts-ignore
-                record[keys[i]] = new Date(cell).toISOString();
+                record[keys[i]] = new Date(cell);
               } else {
                 const cellHyphen = convertHyphenToNull(cell);
                 const cellPoint = convertGermanNumberToNumber(cellHyphen);
@@ -75,32 +75,65 @@ void yargs(hideBin(process.argv))
     (yargs) => {
       return yargs
         .option("input", {
-          alias: "if",
+          alias: "i",
           default: "files/data.csv",
         })
         .option("output", {
-          alias: "of",
+          alias: "o",
           default: "output.csv",
         });
     },
     async (args) => {
       console.log(`Input File: ${args.input} \nOutput File: ${args.output}`);
       const writableStream = fs.createWriteStream(args.output);
+      const stringifier = stringify({
+        header: true,
+        columns: [
+          "",
+          "result",
+          "table",
+          "_time",
+          "_value",
+          "_field",
+          "_measurement",
+        ],
+      });
 
-      const readStream = fs
-        .createReadStream(args.input)
-        .pipe(parse({ raw: true }))
+      fs.createReadStream(args.input)
         .pipe(
-          transform((record) => {
-            console.log(record.raw);
+          parse({
+            trim: true,
+            columns: true,
+          }),
+        )
+        .pipe(
+          transform<Record<string, string>>((record) => {
+            const keys = Object.keys(record);
+            for (let i = 0; i < keys.length; i++) {
+              const key = keys[i];
+              const cell = record[key];
 
-            return "," + record.raw;
+              if (key === "timestamp") continue;
+
+              stringifier.write({
+                "": "",
+                result: "",
+                table: 0,
+                _time: record["timestamp"],
+                _value: cell,
+                _field: "value",
+                _measurement: key,
+              });
+            }
           }),
         );
-      // .pipe(writableStream);
 
-      writableStream.write("fdsfds\n");
-      readStream.pipe(writableStream);
+      writableStream.write("#group,false,false,true,true,true,true\n");
+      writableStream.write(
+        "#datatype,string,long,dateTime:RFC3339,double,string,string\n",
+      );
+      writableStream.write("#default,mean,,,,,\n");
+      stringifier.pipe(writableStream);
     },
   )
   .demandCommand(1)
