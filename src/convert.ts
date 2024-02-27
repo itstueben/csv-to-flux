@@ -1,8 +1,8 @@
 #!/usr/bin/env ts-node
+import * as fs from "fs";
+import { parse, stringify, transform } from "csv";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
-import { parse, stringify, transform } from "csv";
-import * as fs from "fs";
 import { convertGermanNumberToNumber, convertHyphenToNull } from "./helpers";
 
 void yargs(hideBin(process.argv))
@@ -119,7 +119,7 @@ void yargs(hideBin(process.argv))
                 "": "",
                 result: "",
                 table: 0,
-                _time: record["timestamp"],
+                _time: record.timestamp,
                 _value: cell,
                 _field: "value",
                 _measurement: key,
